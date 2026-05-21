@@ -1,0 +1,8 @@
+{
+  "feishu": {
+    "app_id": "在此填写你的飞书应用 App ID",
+    "app_secret": "在此填写你的飞书应用 App Secret",
+    "bot_webhook_url": "在此填写你的飞书机器人 Webhook 地址",
+    "root_wiki_url": "在此填写你的飞书 AI-docs 根目录 Wiki 链接"
+  }
+}
