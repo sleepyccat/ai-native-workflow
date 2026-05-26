@@ -87,7 +87,7 @@ const getUserInfo = (id: number) => {
 |------|------|------|
 | 组件文件 | PascalCase | `UserCard.tsx` |
 | 页面目录 | camelCase | `view/accountManagement/index.tsx` |
-| Hook 文件 | camelCase，use 前缀 | `useBrandId.ts` |
+| Hook 文件 | camelCase，use 前缀 | `usePageSize.ts` |
 | 工具函数 | camelCase | `formatDate.ts` |
 | 样式文件 | 与组件同名 | `index.module.less` |
 | 常量文件 | camelCase | `storageKeys.ts` |
