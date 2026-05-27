@@ -3,7 +3,6 @@
 > 本文件为用户可编辑的参考配置，适用于**汇报类文档**（如 REPORT、周报、季度总结等）。
 > 技术类文档（设计文档、单元测试报告、CR 报告等）有各自固定的模板格式，不适用本风格。
 
-参考文档：https://swn7zpxv453.feishu.cn/wiki/ViYCwzcHjitEuukf3V7cxjVZnbf
 
 ---
 

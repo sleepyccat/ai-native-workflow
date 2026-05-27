@@ -242,19 +242,55 @@ AI-docs/
 
 在七步流程执行过程中，自动记录度量数据（详细规范见 `references/metrics.md`）：
 
+> **⚠️ 强制规则**：度量记录与状态更新、日报更新同等重要，是每个阶段切换时的**必做动作**。
+> 遗漏度量记录视为执行失败，必须立即补做。
+
 ### 自动记录时机
 
-| 时机 | 记录内容 |
+| 时机 | 记录内容 | 强制级别 |
+|------|----------|----------|
+| 进入每个步骤 | `phases.{阶段}.started_at` = 当前时间 | **MUST** |
+| 用户确认通过 | `phases.{阶段}.completed_at` = 当前时间，计算 `duration_minutes` | **MUST** |
+| 每次 AI 响应 | `phases.{阶段}.turns` += 1 | SHOULD |
+| 用户要求修改 | `phases.{阶段}.revisions` += 1 | **MUST** |
+| 用户驳回 | `phases.{阶段}.rejections` += 1 | **MUST** |
+| 第一步完成 | 评估并记录 `complexity`（规模/类型/模块数） | **MUST** |
+| 第五步完成 | 记录 `quality.cr_issues_total` 和 `cr_false_positives` | **MUST** |
+| 第六步完成 | 记录 `quality.test_*` 和 `bugs_found` | **MUST** |
+| 需求上线 | 计算 `total_duration_minutes` 和 `total_turns` | **MUST** |
+
+### 阶段切换检查清单
+
+每次阶段切换（用户确认通过当前步骤）时，AI 必须在同一次 dw-state.json 写入中完成以下所有操作：
+
+1. ✅ 当前阶段 `completed_at` = 当前时间
+2. ✅ 当前阶段 `duration_minutes` = completed_at - started_at（分钟，向上取整）
+3. ✅ 当前阶段 `checklist_completed` = true/false
+4. ✅ 下一阶段 `started_at` = 当前时间（如果立即进入下一步）
+5. ✅ 第一步完成时：填写 `complexity`（size/type/modules_count）
+6. ✅ 更新 `total_turns`（所有阶段 turns 之和）
+7. ✅ 需求完成时：计算 `total_duration_minutes`
+
+### 复杂度评估规则（第一步完成时必填）
+
+| 维度 | 评估标准 |
 |------|----------|
-| 进入每个步骤 | `phases.{阶段}.started_at` = 当前时间 |
-| 用户确认通过 | `phases.{阶段}.completed_at` = 当前时间，计算 `duration_minutes` |
-| 每次 AI 响应 | `phases.{阶段}.turns` += 1 |
-| 用户要求修改 | `phases.{阶段}.revisions` += 1 |
-| 用户驳回 | `phases.{阶段}.rejections` += 1 |
-| 第一步完成 | 评估并记录 `complexity`（规模/类型/模块数） |
-| 第五步完成 | 记录 `quality.cr_issues_total` 和 `cr_false_positives` |
-| 第六步完成 | 记录 `quality.test_*` 和 `bugs_found` |
-| 需求上线 | 计算 `total_duration_minutes` 和 `total_turns` |
+| size | S: <100行变更, M: 100-500行, L: 500-1000行, XL: >1000行 |
+| type | 新功能 / 重构 / Bug修复 / 优化 |
+| modules_count | 涉及的独立业务模块数（按 src/view/ 下的一级目录计） |
+
+### 跳过阶段处理
+
+- 无需联调（第四步）：`integration` 设为 `null`
+- 跳过 CR/单测（用户明确要求跳过）：对应阶段设为 `null`
+- 快速需求（如 hotfix）跳过分析/设计：对应阶段设为 `null`
+
+### Baseline 自动建立
+
+当 `metrics_baseline` 为 null 且已有 ≥5 个需求的 `total_duration_minutes` 不为 null 时：
+1. 自动计算全局 baseline 并写入
+2. 按 size 分层计算（该规模 ≥2 个样本时）
+3. 在对话中告知用户"已建立效率基线"
 
 ### 阶段名映射
 

@@ -130,6 +130,7 @@ daily-workflow 采用混合存储策略：
 | 跨平台导出 | "导出 skill 到 [平台]" | `cross-platform-export` skill |
 | 周报 | "写周报"/"本周总结" | `references/weekly-report.md` |
 | 季度/年度总结 | "写季度总结"/"年度总结" | `references/periodic-summary.md` |
+| 度量报告 | "看看效率数据"/"度量报告"/"效率分析" | `references/metrics-report.md` |
 | 飞书机器人通知 | 关键节点自动触发 | `references/bot-notification.md` |
 
 ## 文档输出风格
@@ -188,3 +189,5 @@ daily-workflow 采用混合存储策略：
 - "移交 [需求名] 给 [人名]" → 需求移交
 - "导出 skill 到 [平台]" → 跨平台导出
 - "写周报" / "写季度总结" / "年度总结" → 生成文档
+- "看看效率数据" / "度量报告" / "效率分析" → 输出度量汇总报告
+- "重新计算 baseline" → 重新计算效率基线
