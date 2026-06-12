@@ -1,0 +1,12 @@
+# 私人凭证
+config.json
+
+# 飞书 Token
+feishu-doc/scripts/.feishu-uat.json
+
+# 工作流输出目录
+dw-docs/
+
+# IDE / 系统
+.DS_Store
+Thumbs.db

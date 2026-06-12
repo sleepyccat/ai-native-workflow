@@ -28,8 +28,8 @@
 
 ### 走查文档
 
-- **飞书后端**：在飞书 `AI-docs/需求文档/YYYYMMDD_[需求名]/` 目录创建，标题格式：`[需求名]_AI走查报告`
-- **本地后端**：保存到 `{SKILLS_DIR}/daily-workflow/output/{项目名}/dw-docs/[需求名]_走查报告.md`
+- 存放位置：`{PROJECT_ROOT}/dw-docs/{需求名}/cr-report.md`
+- 飞书同步（可选）：用户确认后同步到飞书 `AI-docs/需求文档/` 对应目录
 
 ### 严重程度
 

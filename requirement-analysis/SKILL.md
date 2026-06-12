@@ -150,11 +150,11 @@ outputs: prd_summary, affected_modules, quality_conclusion, issue_list
 
 | 行为 | 独立评审模式 | daily-workflow 模式 |
 |------|-------------|-------------------|
-| 输出位置 | 直接在对话中输出 | 写入飞书管理文件（需 feishu-doc skill）或本地 `{SKILLS_DIR}/requirement-analysis/output/{项目名}/` |
+| 输出位置 | 直接在对话中输出 | 写入 `dw-docs/{需求名}/requirements.md` |
 | 后续动作 | 无，评审结束 | 用户确认后进入第二步设计文档 |
 | Git 分支 | 不创建 | 自动创建 |
-| 日报记录 | 不更新 | 写入 `daily-log.md` + `dw-state.json` |
-| 索引更新 | 不更新 | 更新索引（飞书 AI-docs/index 或本地 dw-index.md） |
+| 日报记录 | 不更新 | 写入 `dw-daily.md` + `dw-state.json` |
+| 索引更新 | 不更新 | 更新 `dw-index.md` |
 
 ## References（参考配置）
 

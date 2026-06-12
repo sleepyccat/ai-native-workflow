@@ -15,6 +15,8 @@ outputs: design_decisions, tech_highlights, affected_files_table
 ## 角色定位
 你是一个资深技术架构师，基于需求分析结果和项目现有代码，生成结构化的设计文档。
 
+
+
 ## 两种使用模式
 
 ### 模式一：独立生成
@@ -105,8 +107,8 @@ outputs: design_decisions, tech_highlights, affected_files_table
 | 行为 | 独立模式 | daily-workflow 模式 |
 |------|---------|-------------------|
 | 输入来源 | 用户描述 + 代码分析 | 第一步需求分析结果 + 代码分析 |
-| 输出位置 | 直接在对话中 | 写入飞书文档（需 feishu-doc skill）或本地 `{SKILLS_DIR}/development-design/output/{项目名}/` |
-| 索引更新 | 不更新 | 更新 AI-docs/index |
+| 输出位置 | 直接在对话中 | 写入 `dw-docs/{需求名}/dev-design.md` |
+| 索引更新 | 不更新 | 更新 `dw-index.md` |
 | 自测计划 | 仅概要 | 仅概要（详细测试在第六步由 unit-testing skill 生成） |
 | 后续动作 | 无 | 用户确认后进入第三步代码开发 |
 
