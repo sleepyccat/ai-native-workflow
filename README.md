@@ -4,7 +4,7 @@
 >
 > 适用于任何支持 Skill/Prompt 机制的 AI IDE（Kiro、Claude Code、Cursor 等），只需将 Skill 文件放入对应 IDE 的配置目录即可。
 >
-> **本地优先**：所有文档默认输出为本地 Markdown 文件（`{PROJECT_ROOT}/dw-docs/`），飞书为可选同步渠道。不使用飞书的用户无需任何飞书配置。
+> **飞书是可选的**：不使用飞书的用户无需任何飞书配置，所有 skill 默认在对话中输出结果。如需写入飞书文档，安装 `feishu-doc` skill 并配置凭证即可。
 
 **路径变量说明**：文档中的 `{SKILLS_DIR}` 代表当前 skills 目录的实际路径，不同 IDE 对应不同位置：
 
@@ -25,6 +25,7 @@
 | [development-design](./development-design/) | `设计文档`、`写设计`、`生成设计` | 设计文档生成（交互流程图、数据流图、修改文件表格） |
 | [coding-standards](./coding-standards/) | `编码规范`、`代码规范`、`怎么写` | 编码规范查询与代码风格检查 |
 | [cr-general](./cr-general/) | `代码走查`、`CR`、`code review` | 代码走查，6 大维度 + 专项检查 |
+| [cr-by-mr](./cr-by-mr/) | `CR MR xxx`、`走查MR xxx`、`review MR xxx` | 根据 MR ID 定位合并提交，提取与 master 的 diff 执行代码走查 |
 | [unit-testing](./unit-testing/) | `单元测试`、`写单测`、`跑测试` | 单元测试自动生成与执行，失败用例自动修复 |
 | [test-submission](./test-submission/) | `提测`、`写提测文档` | 提测文档生成，自动填充上下文字段 |
 | [feishu-doc](./feishu-doc/) | `写飞书文档`、`创建飞书文档`、`刷新飞书token` | 飞书文档操作（写作/编辑规范 + 配置管理 + Token 刷新），可选，其他 skill 的飞书输出通道 |
@@ -40,6 +41,7 @@ daily-workflow 流程中自动引用：
   第二步（设计文档）  → development-design skill
   第三步（代码开发）  → coding-standards skill
   第五步（AI CR）    → cr-general skill
+  按 MR 走查时       → cr-by-mr skill
   第六步（单元测试）  → unit-testing skill
   第七步（提测）     → test-submission skill
   飞书输出时        → feishu-doc skill
@@ -53,11 +55,11 @@ daily-workflow 流程中自动引用：
 
 ## 🛠️ 环境依赖
 
-- 支持 Skill/Prompt 机制的 AI IDE（Kiro、Claude Code、Cursor 等）
+- 支持 Skill/Prompt 机制的 AI IDE（Claude Code、Cursor 等）
 - Git（daily-workflow 会自动创建和管理分支）
-- **飞书 MCP**（可选，仅在用户选择同步飞书文档时需要）
+- **飞书 MCP**（可选，用于自动创建/更新飞书云文档）
 
-如需使用飞书同步功能，请安装 `feishu-doc` skill 并配置凭证，详见 [feishu-doc 使用说明](./feishu-doc/README.md)。
+如需使用飞书功能，请安装 `feishu-doc` skill 并配置凭证，详见 [feishu-doc 使用说明](./feishu-doc/README.md)。
 
 ---
 
@@ -75,9 +77,9 @@ daily-workflow 流程中自动引用：
 | Windsurf | `.windsurf/rules/` |
 | 其他 | 参考各 IDE 文档 |
 
-### 配置私人凭证（可选，仅飞书同步需要）
+### 配置私人凭证
 
-如需飞书文档同步功能，复制模板并填写你的飞书应用凭证：
+复制模板并填写你的飞书应用凭证和目录地址：
 
 ```bash
 cp {SKILLS_DIR}/config.example.json {SKILLS_DIR}/config.json
@@ -131,64 +133,72 @@ skills/
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── frontend-concerns.md      # 前端需求关注点
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   └── README.md
 ├── development-design/               # 设计文档 Skill
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── design-template.md        # React + Antd 5 模板配置
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   └── README.md
 ├── coding-standards/                 # 编码规范 Skill
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── tech-stack.md             # React + Antd 5 技术栈配置
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   └── README.md
 ├── cr-general/                       # 代码走查 Skill
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── specialized-checks.md     # 专项检查清单
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   ├── README.md
 │   └── REPORT.md
+├── cr-by-mr/                         # 按 MR ID 代码走查 Skill
+│   ├── SKILL.md                      # 流程定义（定位合并提交→提取 diff→走查）
+│   ├── LEARNING.md                   # 学习规则与反馈日志
+│   └── README.md
 ├── unit-testing/                     # 单元测试 Skill
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── frontend-testing.md       # 前端测试框架配置
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   └── README.md
 ├── test-submission/                  # 提测文档 Skill
 │   ├── SKILL.md                      # 通用流程定义
 │   ├── references/                    # 可替换的引导配置
 │   │   └── frontend-submission.md    # 前端提测文档模板
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   ├── LEARNING.md                   # 学习规则与反馈日志
+│   ├── output/                       # 输出目录
 │   └── README.md
 ├── feishu-doc/                       # 飞书文档操作 Skill（可选）
 │   ├── SKILL.md
 │   ├── references/                    # 可替换的引导配置
-│   │   └── report-style.md           # 文档输出风格偏好
+│   │   └── report-style.md                  # 文档输出风格偏好
 │   ├── scripts/                       # Token 刷新脚本
-│   │   └── feishu_uat_refresh.cjs
-│   ├── LEARNING.md                   # 学习记录与用户偏好
+│   │   └── feishu_uat_refresh.js
+│   ├── LEARNING.md                   # 学习规则与反馈日志
 │   └── README.md
 ├── cross-platform-export/            # 跨平台导出 Skill
 │   └── SKILL.md
 └── daily-workflow/                   # 开发工作流 Skill
     ├── SKILL.md                      # 精简流程骨架，引用 references
     ├── README.md
-    ├── LEARNING.md                   # 学习记录与用户偏好
+    ├── LEARNING.md                   # 学习规则与反馈日志
     ├── REPORT.md
+    ├── output/                       # 输出目录（按项目隔离）
+    │   └── .dw-state.template.json   # 本地状态模板
     └── references/                   # 规范文档集
-        ├── general-rules.md          # 通用规则（Hard Rules、文档存放、日报结构）
-        ├── code-review.md            # CR 走查规范
-        ├── weekly-report.md          # 周报模板
-        ├── periodic-summary.md       # 季度/年度总结模板
+        ├── code-review.md
+        ├── general-rules.md
+        ├── weekly-report.md
+        ├── periodic-summary.md
         ├── index-strategy.md         # 结构化索引策略
-        ├── metrics.md                # 度量数据结构定义
-        ├── metrics-report.md         # 度量报告输出模板
+        ├── feedback-loop.md          # RL 训练闭环
         ├── quick-log.md              # 快速记录规范
         ├── handover.md               # 需求移交规范
+        ├── cross-platform-export.md  # 跨平台导出规范
+        ├── bot-notification.md       # 飞书机器人通知规范
         └── modules/                  # 模块专项规范（可选）
 ```
 
@@ -202,7 +212,7 @@ skills/
 |----|------|--------|------|
 | 通用规则 | `SKILL.md` | AI 维护 | 通用流程定义，不包含技术栈特定内容 |
 | 参考配置 | `references/` | **用户编辑** | 技术栈/团队/个人偏好，换团队时替换即可 |
-| 学习记录 | `LEARNING.md` | AI 管理 | 基于用户反馈自动学习，记录偏好和沉淀规范 |
+| 学习反馈 | `LEARNING.md` | AI 管理 | 基于用户反馈自动学习，记录偏好和沉淀规范 |
 
 **核心设计**：SKILL.md 是通用的，references/ 是可替换的。默认 references 面向 React + Antd 5 前端，换成 Vue/Angular/后端项目只需替换对应参考配置文件。
 
@@ -250,7 +260,7 @@ skills/
 
 | Skill | 不需要时 |
 |-------|---------|
-| feishu-doc | 不使用飞书云文档时删除，daily-workflow 默认本地输出不受影响 |
+| feishu-doc | 不使用飞书云文档时删除，daily-workflow 自动降级为本地存储 |
 | test-submission | 不需要生成提测文档时删除，daily-workflow 第七步会跳过 |
 
 #### 适配示例
@@ -268,11 +278,11 @@ skills/
 
 ## 🧠 自我学习
 
-每个功能型 Skill 都具备独立的学习机制，各自维护 `LEARNING.md` 文件：
+每个功能型 Skill 都具备独立的学习和反馈机制，各自维护 `LEARNING.md` 文件：
 
 | Skill | 学习文件 | 学习内容 |
 |-------|---------|---------|
-| daily-workflow | `LEARNING.md` | 流程偏好、用户习惯、步骤优化 |
+| daily-workflow | `LEARNING.md` + `references/feedback-loop.md` | 流程级反馈、用户偏好、步骤优化 |
 | requirement-analysis | `LEARNING.md` | 检查维度调整、问题模式发现 |
 | development-design | `LEARNING.md` | 文档结构偏好、组件拆分策略 |
 | coding-standards | `LEARNING.md` | 规范条目增改、编码偏好 |
@@ -280,4 +290,4 @@ skills/
 | unit-testing | `LEARNING.md` | 测试框架配置、Mock 策略、覆盖维度调整 |
 | feishu-doc | `LEARNING.md` | 飞书格式规则、编辑操作偏好 |
 
-核心机制：**发现 → 问 → 改规范 → 生效**。用户纠正或补充时，AI 主动询问是否沉淀为规范，确认后直接修改对应文件并在 LEARNING.md 记录。
+统一策略：同类修改 ≥2 次建议更新规范，驳回 ≥1 次下次规避，确认 ≥3 次固化最佳实践。所有学习记录可追溯。

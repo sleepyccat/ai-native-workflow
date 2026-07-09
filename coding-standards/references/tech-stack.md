@@ -294,6 +294,35 @@ useEffect(() => {
 const sortedList = useMemo(() => list.sort((a, b) => a.id - b.id), [list])
 ```
 
+#### useCallback / useMemo 使用判定
+
+默认不加 `useCallback` / `useMemo`。它们本身有成本（创建依赖数组、每次渲染做依赖比较、占内存），滥用反而降低可读性，还容易制造“假稳定”：依赖写漏导致读到旧 state（stale closure），依赖写全引用又频繁变，把 bug 藏进依赖数组。
+
+仅在以下三类场景使用：
+
+1. 函数/值要作为 `useEffect` / `useMemo` / `useCallback` 的依赖，且需要引用稳定来控制触发时机
+2. 函数/值作为 prop 传给 `React.memo` 包裹的子组件，且该子组件确实是渲染热点
+3. 自定义 Hook 对外暴露函数/值，希望调用方能安全地放进依赖数组
+
+```typescript
+// ✅ 正确：进了 effect 依赖，需要稳定引用
+const fetchList = useCallback(() => getList(params), [params])
+useEffect(() => {
+  fetchList()
+}, [fetchList])
+
+// ❌ 没必要：普通事件回调，只绑在 onClick 上，不进任何依赖
+const handleClick = useCallback(() => setOpen(true), [])
+// 直接写普通函数即可
+const handleClick = () => setOpen(true)
+```
+
+注意：
+
+- 子组件没有用 `React.memo` 时，给回调包 `useCallback` 不会跳过子组件渲染，等于白包
+- 不要为了消除 `react-hooks/exhaustive-deps` 警告而无脑包 `useCallback`，更不要用 disable 注释强行压掉警告——警告往往说明 effect 设计本身有问题，应从拆分 effect / 修正依赖入手
+```
+
 ### JSX Props 展开
 
 ESLint 配置 `react/jsx-props-no-spreading` 为 warn，尽量避免 `{...props}` 展开：

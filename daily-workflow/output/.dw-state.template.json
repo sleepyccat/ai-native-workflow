@@ -1,0 +1,124 @@
+{
+  "project": "项目名（工作目录 basename）",
+  "storage_backend": "local | feishu",
+  "metrics_baseline": null,
+  "requirements": [
+    {
+      "name": "需求名",
+      "branch": "feature/xxx-yyy",
+      "status": "分析中 | 设计中 | 开发中 | 联调中 | AI CR中 | 单元测试中 | 提测中 | 已提测 | 测试中 | 已上线",
+      "pm_url": "项目管理地址（Jira/Tapd/飞书项目等）或 null",
+      "prd_source": "本地文件路径或飞书链接",
+      "created": "2026-05-08",
+      "completed": null,
+      "documents": {
+        "requirement_analysis": "dw-docs/[需求名]_需求分析.md",
+        "design": "dw-docs/[需求名]_设计文档.md",
+        "cr_report": "dw-docs/[需求名]_走查报告.md",
+        "unit_test_report": "dw-docs/[需求名]_单元测试报告.md",
+        "test_submission": "dw-docs/[需求名]_提测文档.md"
+      },
+      "context": {
+        "prd_summary": "一句话需求摘要，第一步完成后填写",
+        "api_doc_url": "接口文档地址，用户提供时填写",
+        "design_decisions": ["关键设计决策1", "关键设计决策2"],
+        "affected_modules": ["src/views/xxx", "src/components/xxx"],
+        "tech_highlights": "核心技术方案摘要，第二步完成后填写",
+        "integration_notes": "联调注意事项，第四步完成后填写"
+      },
+      "module_spec": "modules/xxx.md 或 null",
+      "daily_log": {
+        "2026-05-08": ["完成需求分析", "完成设计文档"],
+        "2026-05-09": ["完成开发"]
+      },
+      "metrics": {
+        "complexity": {
+          "size": "S | M | L | XL",
+          "type": "新功能 | 重构 | Bug修复 | 优化",
+          "modules_count": 1
+        },
+        "phases": {
+          "requirement_analysis": {
+            "started_at": "2026-05-08T10:00:00+08:00",
+            "completed_at": "2026-05-08T10:45:00+08:00",
+            "duration_minutes": 45,
+            "turns": 5,
+            "revisions": 1,
+            "rejections": 0,
+            "checklist_completed": true
+          },
+          "design": {
+            "started_at": null,
+            "completed_at": null,
+            "duration_minutes": null,
+            "turns": 0,
+            "revisions": 0,
+            "rejections": 0,
+            "checklist_completed": false
+          },
+          "development": {
+            "started_at": null,
+            "completed_at": null,
+            "duration_minutes": null,
+            "turns": 0,
+            "revisions": 0,
+            "rejections": 0,
+            "checklist_completed": false
+          },
+          "integration": null,
+          "code_review": {
+            "started_at": null,
+            "completed_at": null,
+            "duration_minutes": null,
+            "turns": 0,
+            "revisions": 0,
+            "rejections": 0,
+            "checklist_completed": false
+          },
+          "unit_test": {
+            "started_at": null,
+            "completed_at": null,
+            "duration_minutes": null,
+            "turns": 0,
+            "revisions": 0,
+            "rejections": 0,
+            "checklist_completed": false
+          },
+          "test_submission": {
+            "started_at": null,
+            "completed_at": null,
+            "duration_minutes": null,
+            "turns": 0,
+            "revisions": 0,
+            "rejections": 0,
+            "checklist_completed": false
+          }
+        },
+        "quality": {
+          "cr_issues_total": 0,
+          "cr_false_positives": 0,
+          "test_coverage_percent": null,
+          "test_cases_total": 0,
+          "test_first_pass_rate": null,
+          "bugs_found": 0
+        },
+        "total_duration_minutes": null,
+        "total_turns": 0
+      }
+    }
+  ],
+  "archived": [
+    {
+      "name": "已完成的需求名",
+      "branch": "feature/xxx",
+      "status": "已上线",
+      "archived_date": "2026-05-01",
+      "metrics_summary": {
+        "total_duration_minutes": 480,
+        "total_turns": 35,
+        "complexity_size": "M",
+        "test_coverage_percent": 85
+      }
+    }
+  ]
+}

@@ -4,12 +4,12 @@ description: 代码走查，输出飞书文档报告。当用户说"代码走查
 inputs: affected_files_table（来自 development-design，可选）, design_decisions（可选）
 outputs: cr_issues_total, cr_false_positives, cr_report
 ---
-
 # Skill: 代码走查
 
 ## 触发词
 - 代码走查 / code review / CR / 走查
 - 走查 [模块名/文件路径]
+- CR MR [MR号]
 - 生成走查报告
 
 ## 两种使用模式
@@ -24,14 +24,57 @@ outputs: cr_issues_total, cr_false_positives, cr_report
 
 ### 第一步：确认走查范围
 
-**如果用户提供了文件范围**：直接使用。
-**如果用户未提供**：询问以下信息：
+**优先级顺序**（按以下顺序尝试确定范围）：
+
+#### 1A. 用户提供了 MR 号或分支名
+
+当用户输入 `CR MR xxxx` 或提供分支名时，通过 git 自动获取变更文件列表：
+
+```bash
+# 第一步：找到分支的 merge-base（分支从哪个 commit 拉出来的）
+git merge-base <目标分支> <feature分支>
+
+# 第二步：基于 merge-base 获取真正的变更文件（仅包含 feature 分支自己的改动）
+git diff <merge-base>..origin/<feature分支> --name-only
+```
+
+**⚠️ 关键规则：绝对不要使用 `git diff master..<feature>` 这种写法！**
+- 这种写法会包含 master 上有但 feature 分支没有的代码（反向 diff），导致走查范围混入无关文件
+- 必须先用 `merge-base` 找到分支起点，再基于起点做单向 diff
+
+**如果无法通过 git 获取**（如远程分支未 fetch、命令执行异常）：
+- 提示用户在 GitLab MR 页面的 Changes 标签复制文件列表
+- 或让用户在终端运行 `git diff $(git merge-base master HEAD) --name-only` 贴结果
+
+#### 1B. 用户提供了文件范围
+
+直接使用用户指定的文件路径/glob 模式。
+
+#### 1C. 用户未提供任何范围
+
+询问以下信息：
 
 1. **代码文件范围**（必填）：
-   - 示例：`src/**/*.ts`
    - 支持文件路径、文件夹路径、glob 模式
+   - 支持 MR 号或分支名（AI 自动解析）
 2. **关联需求文档**（可选）：飞书设计文档链接，提供后会额外检查与设计文档的一致性
 3. **专项检查**（可选）：是否需要特定业务场景的专项检查（如 IP 联名套餐、营销活动等）
+
+#### 范围过滤规则
+
+从 diff 文件列表中排除以下非业务文件，不纳入走查：
+- `CHANGELOG.md`
+- `package.json` / `package-lock.json`
+- 纯图片文件（`.png`, `.jpg`, `.gif`, `.svg`）
+- `.less` 样式文件（除非样式逻辑复杂需要单独评审）
+
+仅走查 `.ts` / `.tsx` 业务代码文件。样式文件 `.m.less` 如果包含逻辑类名（如条件样式、动态 className）可纳入。
+
+#### 读取变更文件内容
+
+- 如果当前在 feature 分支上：直接用 `readFile` 读取
+- 如果当前在 master/其他分支：用 `git show origin/<feature分支>:<文件路径>` 读取 feature 分支上的文件内容
+- 对于需要了解 diff 的场景：用 `git diff <merge-base>..origin/<feature分支> -- <文件路径>` 查看具体改动
 
 ### 第二步：确认输出方式（可选）
 
